@@ -26,9 +26,10 @@ def main(accounts, threads, start):
 	click.secho('Finished in %ss' % round((time.time()-starttime), 2), fg='yellow')
 
 def DoWork(account):
-	if auth(account):
+	authresponse = auth(account)
+	if authresponse:
 		with print_lock:
-			click.secho('The account %s is working!' % account, fg='green')
+			click.secho('Account %s has %s days left.' % (account, authresponse.split()[5]), fg='green')
 			working.append(account)
 
 def Worker(q):
