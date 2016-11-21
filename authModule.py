@@ -12,7 +12,7 @@ def oldAuth(account):
 		'Cache-Control': 'max-age=0',
 
 	})
-	req = session.get(homepage, timeout=3)
+	req = session.get(homepage, timeout=10)
 	csrfCookie = requests.utils.dict_from_cookiejar(session.cookies)['csrftoken']
 	loginData = {
 			'csrfmiddlewaretoken': csrfCookie,
@@ -38,7 +38,7 @@ def auth(account):
 		'Cache-Control': 'max-age=0',
 
 	})
-	req = session.get(homepage, timeout=3)
+	req = session.get(homepage, timeout=10)
 	csrfCookie = requests.utils.dict_from_cookiejar(session.cookies)['csrftoken']
 	loginData = {
 			'csrfmiddlewaretoken': csrfCookie,

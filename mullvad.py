@@ -5,14 +5,18 @@ import threading
 import click
 
 queue = Queue()
-working = []
 print_lock = threading.Lock()
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
-@click.command()
-@click.option('--threads', default=1, help='Number of threads.')
-@click.option('--accounts', default=5, help='Number of accounts.')
-@click.option('--start', default=0)
+@click.command(context_settings=CONTEXT_SETTINGS)
+@click.option('-t', '--threads', default=1, help='Number of threads.')
+@click.option('-a', '--accounts', default=5, help='Number of accounts.')
+@click.option('-s', '--start', help='Number to start from.', default=0)
 def main(accounts, threads, start):
+	"""This is a simple python script to scrape Mullvad.net accounts.
+
+	Use with caution, this software is released as as under the WTFPL.
+	"""
 	starttime = time.time()
 	for x in range(accounts):
 		queue.put(start+x)
@@ -30,7 +34,6 @@ def DoWork(account):
 	if authresponse:
 		with print_lock:
 			click.secho('Account %s has %s days left.' % (account, authresponse.split()[5]), fg='green')
-			working.append(account)
 
 def Worker(q):
 	while True:
