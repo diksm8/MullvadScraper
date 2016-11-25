@@ -10,4 +10,4 @@ The auth method can also be used for other csrf protected websites.
 - [ ] Continue from last number
 - [ ] Exception handling
 - [ ] Keyboard interrupt to close
-- [ ] 12 random digits checker
+- [X] 12 random digits checker
