@@ -9,6 +9,7 @@ import click
 from random import randint
 
 queue = Queue()
+barQ = Queue()
 print_lock = threading.Lock()
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
@@ -38,8 +39,11 @@ def scrape(accounts, threads, start, random, output):
 		worker.setDaemon(True)
 		worker.start()
 
+	worker = threading.Thread(target=BarWorker, args=(accounts,barQ,))
+	worker.setDaemon(True)
+	worker.start()
+	
 	queue.join()
-	click.clear()
 	click.secho('\nFinished in %ss' % round((time.time()-starttime), 2), fg='yellow')
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
@@ -70,19 +74,23 @@ def DoWork(account, output):
 	 		click.secho('Request timed out.', fg='red')
 	 		os._exit(666)
 	if authresponse:
-		with print_lock:
-			click.echo('Account %s has %s days left.' % (account, authresponse.split()[5]), file=output)
-			output.flush()
+		click.echo('Account %s has %s days left.' % (account, authresponse.split()[5]), file=output)
+		output.flush()
 
 def Worker(q, a, o):
 	while True:
 		account = q.get()
 		DoWork(account, o)
 		q.task_done()
-		with click.progressbar(length=a, label='Checking the accounts') as bar:
-			with print_lock:
-				click.clear()
- 				bar.update(a-queue.qsize())
+		barQ.put(q.qsize())
+
+def BarWorker(a, barq):
+	bar = click.progressbar(length=a, label='Checking the accounts')
+	while True:
+		size = barq.get()
+		#click.clear()
+ 		bar.update(a-size)
+
 
 def random_with_N_digits(n):
 	range_start = 10**(n-1)
