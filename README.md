@@ -15,4 +15,4 @@ If you run too many threads at once they will start to time out and the program 
 - [ ] Exception handling
 - [ ] Keyboard interrupt to close
 - [ ] Continue from last number
-- [ ] Make the random script part of mullvad.py as a second click command
+- [ ] Make the fileChecker script part of mullvad.py as a second click command
