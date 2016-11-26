@@ -37,13 +37,12 @@ def main(accounts, threads, start, random):
 	click.secho('Finished in %ss' % round((time.time()-starttime), 2), fg='yellow')
 
 def DoWork(account):
-	# try:								#Need to make this kill entire program if one thread fails.
-	# 	authresponse = auth(account)
-	# except requests.Timeout:
-	# 	print 'meme'
-	# 	sys.exit()
+	try:
+		authresponse = auth(account)
+	except requests.Timeout:
+	 	print 'meme'
+	 	os._exit(666)
 
-	authresponse = auth(account)
 	if authresponse:
 		with print_lock:
 			click.secho('Account %s has %s days left.' % (account, authresponse.split()[5]), fg='green')
