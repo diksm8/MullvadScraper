@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import requests, time, os, sys
 from Queue import Queue
 from authModule import auth
@@ -35,6 +37,12 @@ def main(accounts, threads, start, random):
 	click.secho('Finished in %ss' % round((time.time()-starttime), 2), fg='yellow')
 
 def DoWork(account):
+	# try:								#Need to make this kill entire program if one thread fails.
+	# 	authresponse = auth(account)
+	# except requests.Timeout:
+	# 	print 'meme'
+	# 	sys.exit()
+
 	authresponse = auth(account)
 	if authresponse:
 		with print_lock:
@@ -45,8 +53,6 @@ def Worker(q):
 		account = q.get()
 		DoWork(account)
 		q.task_done()
-
-
 
 def random_with_N_digits(n):
 	range_start = 10**(n-1)
