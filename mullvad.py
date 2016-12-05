@@ -16,12 +16,12 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.group(context_settings=CONTEXT_SETTINGS)
 def cli():
 	"""This is a simple python script to scrape Mullvad.net accounts.
-	Use with caution, this software is released as as under the WTFPL."""
+	Use with caution, this software is released as is under the WTFPL."""
 	pass
 
-@click.option('-t', '--threads', default=1, help='Number of threads.')
-@click.option('-a', '--accounts', default=5, help='Number of accounts.')
-@click.option('-s', '--start', default=0, help='Number to start from.')
+@click.option('-t', '--threads', required=True, type=click.INT, help='Number of threads.')
+@click.option('-a', '--accounts', required=True, type=click.INT, help='Number of accounts.')
+@click.option('-s', '--start', default=0, type=click.INT, help='Number to start from.')
 @click.option('-r', '--random', type=click.IntRange(1, 15), help='Randomize number to check.')
 @click.argument('output', type=click.File('a'))
 @cli.command(context_settings=CONTEXT_SETTINGS)
@@ -46,18 +46,25 @@ def scrape(accounts, threads, start, random, output):
 	queue.join()
 	click.secho('\nFinished in %ss' % round((time.time()-starttime), 2), fg='yellow')
 
-@click.argument('input', type=click.File('r'))
 @cli.command(context_settings=CONTEXT_SETTINGS)
-def check(input):
-	"""Check accounts in a file."""
-	for line in input:
-		newLine = line.replace("\n", "")
-		authresponse = auth(newLine)
-		if authresponse:
-			click.secho('Account %s has %s days left.' % (newLine, authresponse.split()[5]), fg='green')
-		else:
-			click.secho('Account %s is dead.' % newLine, fg='red')
+@click.argument('input', type=click.File('r'))
+@click.option('-t', '--threads', required=True, type=click.INT, help='Number of threads.')
+def check(input, threads):
+	"""Check accounts in a file.
 
+	Example usage:
+	python mullvad.py check accounts.txt"""
+	starttime = time.time()
+	for line in input:
+		queue.put(line.replace("\n", ""))
+
+	for i in range(threads):
+		worker = threading.Thread(target=Worker, args=(queue,))
+		worker.setDaemon(True)
+		worker.start()
+
+	queue.join()
+	click.secho('Finished in %ss' % round((time.time()-starttime), 2), fg='yellow')
 
 def DoWork(account, output):
 	try:
@@ -66,7 +73,6 @@ def DoWork(account, output):
 		with print_lock:
 	 		click.secho('Request timed out.', fg='red')
 	 		os._exit(666)
-
 	if authresponse:
 		click.echo('Account %s has %s days left.' % (account, authresponse.split()[5]), file=output)
 		output.flush()
