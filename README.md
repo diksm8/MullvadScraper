@@ -8,10 +8,11 @@ If you run too many threads at once they will start to time out and the program 
 ##ToDo
 - [X] Threading
 - [X] 12 random digits checker
-- [X] Read accounts from list and check
-- [X] Exception handling
-- [X] Make the fileChecker script part of mullvad.py as a second click command
 - [ ] Click progressbar
 - [ ] Save to file using click
+- [ ] Read accounts from list and check
 - [ ] Continue from last number
+- [ ] Exception handling
 - [ ] Keyboard interrupt to close
+- [ ] Continue from last number
+- [ ] Make the fileChecker script part of mullvad.py as a second click command
