@@ -1,0 +1,6 @@
+{
+  "name": "Mullvadscraper",
+  "tagline": "A scraper for Mullvad.net VPN accounts.",
+  "body": "#MullvadScraper\r\nScraper made in python to find accounts on mullvad.net.\r\nThe auth method can also be used for other csrf protected websites.\r\n\r\n##Download\r\nHead on over to the [latest releases](https://github.com/diksm8/MullvadScraper/releases/latest) page and download either cx_Freeze.zip or py2exe.zip, unzip and run the exe.\r\n\r\n##Disclaimer\r\nIf you run too many threads at once they will start to time out and the program will crash, burn and break. Please refrain from being an idiot since I am too much of one to fix this problem. You need to kill the python process if this happens.\r\n\r\n##ToDo\r\nI am done with this project. Feel free to bug me about it as much as you want but I won't fix shit.\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
