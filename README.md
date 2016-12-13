@@ -1,3 +1,8 @@
+<h3 align="center">
+    <a href="https://github.com/diksm8/MullvadScraper">
+        <img src="https://raw.githubusercontent.com/diksm8/MullvadScraper/master/mullvad.ico" />
+    </a>
+</h3>
 #MullvadScraper
 Scraper made in python to find accounts on mullvad.net.
 The auth method can also be used for other csrf protected websites.
